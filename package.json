@@ -1,0 +1,9 @@
+{
+    "private": true,
+    "name": "playneous",
+    "version": "1.0.0",
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ]
+}
