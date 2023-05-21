@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,4 +5,17 @@ generator client {
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+type DeleteThisLocation {
+  coordinates Float[]
+  type        String
+}
+
+model DELETE_THIS_ {
+  id       String             @id @default(auto()) @map("_id") @db.ObjectId
+  location DeleteThisLocation
+
+  @@index([location], map: "location_2dsphere")
+  @@map("_DELETE_THIS_")
 }
