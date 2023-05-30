@@ -7,14 +7,14 @@ import { EventIcon } from "./EventIcon";
 
 export const EventMarker: React.FC<{
     coordinate: LatLng
-}> = ({ coordinate, }) => {
+}> = ({ coordinate }) => {
     return (
         <Marker
             coordinate={coordinate}
             tracksViewChanges={false}
         >
             <View style={styles.container}>
-                <EventIcon size={responsiveFontSize(5)} style={styles.marker} />
+                <EventIcon size={responsiveFontSize(5)} style={styles.marker} color="white" />
                 <View style={styles.triangle} />
             </View>
             <EventCallout />
