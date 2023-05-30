@@ -1,7 +1,8 @@
 import { LatLng, Marker } from "react-native-maps";
 import { StyleSheet, View } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
 import { responsiveFontSize } from "../utils/responsiveFontSize";
+import { EventCallout } from "./EventCallout";
+import { EventIcon } from "./EventIcon";
 
 
 export const EventMarker: React.FC<{
@@ -13,9 +14,10 @@ export const EventMarker: React.FC<{
             tracksViewChanges={false}
         >
             <View style={styles.container}>
-                <MaterialIcons name="event" size={responsiveFontSize(5)} color="white" style={styles.marker} />
+                <EventIcon size={responsiveFontSize(5)} style={styles.marker} />
                 <View style={styles.triangle} />
             </View>
+            <EventCallout />
         </Marker>
     );
 }

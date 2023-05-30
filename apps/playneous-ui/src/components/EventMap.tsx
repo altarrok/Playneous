@@ -47,7 +47,6 @@ export const EventMap: React.FC = () => {
                 }}
             />
             {/* 
-                - Use Custom callouts on the markers
                 - Create a carousel (https://github.com/dohooo/react-native-reanimated-carousel)
                 - When carousel item is selected, move the map to that event's location
                 - When a marker is used, corresponding carousel item is selected
