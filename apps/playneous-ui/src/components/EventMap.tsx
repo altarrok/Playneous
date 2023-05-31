@@ -1,18 +1,40 @@
-import { useEffect, useState } from "react";
-import MapView, { Callout, Marker } from "react-native-maps";
-
+import { useEffect, useRef, useState } from "react";
+import MapView, { LatLng, MapMarker } from "react-native-maps";
 import * as Location from 'expo-location';
 import { EventMarker } from "./EventMarker";
-import Carousel from "react-native-reanimated-carousel";
-import { responsiveFontSize } from "../utils/responsiveFontSize";
-import { View, Text } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { EventCarousel } from "./EventCarousel";
+import { EventCarousel, TEvent } from "./EventCarousel";
 
+const mockEvents: (TEvent & { location: LatLng })[] = [
+    {
+        title: "beach volley",
+        category: "volleyball",
+        location: {
+            latitude: 49.2483,
+            longitude: -122.867
+        }
+    },
+    {
+        title: "spikeball",
+        location: {
+            latitude: 49.2483,
+            longitude: -122.868
+        }
+    },
+    {
+        title: "hoop",
+        category: "basketball",
+        location: {
+            latitude: 49.2483,
+            longitude: -122.869
+        }
+    },
+]
 
 export const EventMap: React.FC = () => {
     const [location, setLocation] = useState<Location.LocationObject>();
-
+    const [events] = useState(mockEvents);
+    const mapRef = useRef<MapView>(null);
+    const markerRefs = events.map(event => useRef<MapMarker>(null));
 
     useEffect(() => {
         (async () => {
@@ -34,8 +56,8 @@ export const EventMap: React.FC = () => {
 
     return (
         <>
-
             <MapView
+                ref={mapRef}
                 style={{ width: "100%", height: "100%" }}
                 initialRegion={{
                     latitude: location.coords.latitude,
@@ -47,31 +69,32 @@ export const EventMap: React.FC = () => {
                 minZoomLevel={12}
                 maxZoomLevel={18}
             >
-                <EventMarker
-                    coordinate={{
-                        latitude: location.coords.latitude,
-                        longitude: location.coords.longitude,
-                    }}
-                />
+                {
+                    events.map((event, i) => (
+                        <EventMarker
+                            coordinate={event.location}
+                            category={event.category}
+                            ref={markerRefs[i]}
+                            key={i}
+                        />
+                    ))
+                }
                 {/* 
-                - When carousel item is selected, move the map to that event's location
                 - When a marker is used, corresponding carousel item is selected
                 - When a marker is used, show details in the callout
             */}
             </MapView>
-            <EventCarousel events={[
-                {
-                    title: "beach volley",
-                    category: "volleyball"
-                },
-                {
-                    title: "spikeball"
-                },
-                {
-                    title: "hoop",
-                    category: "basketball"
-                },
-            ]} />
+            <EventCarousel
+                events={events}
+                onSnapToItem={(i) => {
+                    mapRef.current?.animateToRegion({
+                        ...events[i].location,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                    });
+                    markerRefs[i].current?.showCallout();
+                }}
+            />
         </>
     );
 

@@ -10,7 +10,10 @@ export type TEvent = {
     category?: "basketball" | "volleyball"
 }
 
-export const EventCarousel: React.FC<{ events: TEvent[] }> = ({ events }) => {
+export const EventCarousel: React.FC<{ 
+    events: TEvent[],
+    onSnapToItem?: (index: number) => void
+}> = ({ events, onSnapToItem }) => {
     return (
         <View style={styles.carouselContainer}>
             <GestureHandlerRootView>
@@ -22,6 +25,7 @@ export const EventCarousel: React.FC<{ events: TEvent[] }> = ({ events }) => {
                     mode="parallax"
                     scrollAnimationDuration={1000}
                     snapEnabled={true}
+                    onSnapToItem={onSnapToItem}
                     renderItem={({ item }) => (
                         <View style={styles.card}>
                             <View style={styles.titleContainer}>
