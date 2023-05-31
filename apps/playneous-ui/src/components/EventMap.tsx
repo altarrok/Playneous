@@ -3,6 +3,7 @@ import MapView, { LatLng, MapMarker } from "react-native-maps";
 import * as Location from 'expo-location';
 import { EventMarker } from "./EventMarker";
 import { EventCarousel, TEvent } from "./EventCarousel";
+import { ICarouselInstance } from "react-native-reanimated-carousel";
 
 const mockEvents: (TEvent & { location: LatLng })[] = [
     {
@@ -34,6 +35,7 @@ export const EventMap: React.FC = () => {
     const [location, setLocation] = useState<Location.LocationObject>();
     const [events] = useState(mockEvents);
     const mapRef = useRef<MapView>(null);
+    const carouselRef = useRef<ICarouselInstance>(null);
     const markerRefs = events.map(event => useRef<MapMarker>(null));
 
     useEffect(() => {
@@ -75,16 +77,17 @@ export const EventMap: React.FC = () => {
                             coordinate={event.location}
                             category={event.category}
                             ref={markerRefs[i]}
+                            onPress={() => carouselRef.current?.scrollTo({
+                                index: i,
+                                animated: true,
+                            })}
                             key={i}
                         />
                     ))
                 }
-                {/* 
-                - When a marker is used, corresponding carousel item is selected
-                - When a marker is used, show details in the callout
-            */}
             </MapView>
             <EventCarousel
+                ref={carouselRef}
                 events={events}
                 onSnapToItem={(i) => {
                     mapRef.current?.animateToRegion({

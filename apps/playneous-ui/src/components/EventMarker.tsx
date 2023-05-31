@@ -7,15 +7,17 @@ import { forwardRef } from "react";
 
 type TEventMarkerProps = {
     coordinate: LatLng,
-    category?: "basketball" | "volleyball"
+    category?: "basketball" | "volleyball",
+    onPress?: () => void,
 }
 
-export const EventMarker = forwardRef<MapMarker, TEventMarkerProps>(({ coordinate, category }, ref) => {
+export const EventMarker = forwardRef<MapMarker, TEventMarkerProps>(({ coordinate, category, onPress }, ref) => {
     return (
         <Marker
             coordinate={coordinate}
             tracksViewChanges={false}
             ref={ref}
+            onPress={onPress}
         >
             <View style={styles.container}>
                 <EventIcon
