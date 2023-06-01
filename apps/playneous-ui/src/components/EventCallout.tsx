@@ -1,16 +1,17 @@
 import { Callout } from "react-native-maps";
-import { Text, View, StyleSheet, ScrollView } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 import { responsiveFontSize } from "../utils/responsiveFontSize";
+import { TEvent } from "./EventMap";
 
-export const EventCallout: React.FC = () => {
+export const EventCallout: React.FC<{ event: TEvent }> = ({ event }) => {
     return (
         <Callout tooltip>
             <View style={styles.container}>
                 <View style={styles.subContainer}>
-                        <Text style={styles.text}>We are playing basketball</Text>
+                        <Text style={styles.text} selectable>{ event.description }</Text>
                 </View>
                 <View style={styles.subContainer}>
-                        <Text style={styles.text}>604 440 67 63</Text>
+                        <Text style={styles.text} selectable>{ event.contactInfo }</Text>
                 </View>
             </View>
         </Callout>

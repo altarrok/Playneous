@@ -1,20 +1,20 @@
-import { LatLng, MapMarker, Marker } from "react-native-maps";
+import { MapMarker, Marker } from "react-native-maps";
 import { StyleSheet, View } from 'react-native';
 import { responsiveFontSize } from "../utils/responsiveFontSize";
 import { EventCallout } from "./EventCallout";
 import { EventIcon } from "./EventIcon";
 import { forwardRef } from "react";
+import { TEvent } from "./EventMap";
 
 type TEventMarkerProps = {
-    coordinate: LatLng,
-    category?: "basketball" | "volleyball",
+    event: TEvent,
     onPress?: () => void,
 }
 
-export const EventMarker = forwardRef<MapMarker, TEventMarkerProps>(({ coordinate, category, onPress }, ref) => {
+export const EventMarker = forwardRef<MapMarker, TEventMarkerProps>(({ event, onPress }, ref) => {
     return (
         <Marker
-            coordinate={coordinate}
+            coordinate={event.location}
             tracksViewChanges={false}
             ref={ref}
             onPress={onPress}
@@ -24,11 +24,11 @@ export const EventMarker = forwardRef<MapMarker, TEventMarkerProps>(({ coordinat
                     size={responsiveFontSize(5)}
                     style={styles.marker}
                     color="white"
-                    category={category}
+                    category={event.category}
                 />
                 <View style={styles.triangle} />
             </View>
-            <EventCallout />
+            <EventCallout event={event} />
         </Marker>
     );
 });

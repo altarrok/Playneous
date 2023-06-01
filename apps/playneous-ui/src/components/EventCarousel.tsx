@@ -1,16 +1,11 @@
-import { Text, View, StyleSheet, TouchableOpacity, Dimensions, Animated } from "react-native";
+import { Text, View, StyleSheet, Animated } from "react-native";
 import { responsiveFontSize } from "../utils/responsiveFontSize";
 import { GestureHandlerRootView, TapGestureHandler } from "react-native-gesture-handler";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { EventIcon } from "./EventIcon";
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
-import { Easing, interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
-
-// placeholder type until prisma schema is ready
-export type TEvent = {
-    title: string,
-    category?: "basketball" | "volleyball"
-}
+import { forwardRef, useCallback, useEffect, useRef } from "react";
+import { Easing, interpolate, useSharedValue, withTiming } from "react-native-reanimated";
+import { TEvent } from "./EventMap";
 
 type TEventCarouselProps = {
     events: TEvent[],
@@ -36,7 +31,7 @@ export const EventCarousel = forwardRef<ICarouselInstance, TEventCarouselProps>(
         focusedItemScale.value = withTiming(carouselFocused ? 1 : 0.8, { duration: 1000, easing: Easing.linear });
 
         Animated.timing(animatedCarouselBottomOffset, {
-            toValue: responsiveFontSize(carouselFocused ? 0 : responsiveFontSize(20)),
+            toValue: responsiveFontSize(carouselFocused ? 0 : carouselBottomOffset),
             duration: 200,
             useNativeDriver: true,
         }).start();
