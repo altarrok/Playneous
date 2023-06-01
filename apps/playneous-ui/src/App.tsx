@@ -5,6 +5,7 @@ import { Platform, SafeAreaView, StyleSheet, View } from 'react-native';
 import { trpc } from './utils/trpc';
 import { StatusBar } from 'expo-status-bar';
 import Constants from "expo-constants";
+import { EventMap } from './components/EventMap';
 
 
 export default function App() {
@@ -24,13 +25,12 @@ export default function App() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <ChatContextProvider>
           <SafeAreaView style={[styles.container, { paddingTop: statusBarHeight }]}>
             <View style={styles.innerContainer}>
               <StatusBar style="light" translucent backgroundColor="transparent" />
+              <EventMap />
             </View>
           </SafeAreaView>
-        </ChatContextProvider>
       </QueryClientProvider>
     </trpc.Provider >
   );
@@ -42,10 +42,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2e2e2e',
   },
   innerContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 16,
+    flex: 1
   },
 });
 
