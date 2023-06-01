@@ -29,18 +29,58 @@ const mockEvents: (TEvent & { location: LatLng })[] = [
             longitude: -122.869
         }
     },
+    {
+        title: "hoop",
+        category: "basketball",
+        location: {
+            latitude: 49.2483,
+            longitude: -122.870
+        }
+    },
+    {
+        title: "hoop",
+        category: "basketball",
+        location: {
+            latitude: 49.2483,
+            longitude: -122.866
+        }
+    },
+    {
+        title: "hoop",
+        category: "basketball",
+        location: {
+            latitude: 49.2483,
+            longitude: -122.865
+        }
+    },
+    {
+        title: "hoop",
+        category: "basketball",
+        location: {
+            latitude: 49.2483,
+            longitude: -122.864
+        }
+    },
+    {
+        title: "hoop",
+        category: "basketball",
+        location: {
+            latitude: 49.2483,
+            longitude: -122.871
+        }
+    },
 ]
 
 export const EventMap: React.FC = () => {
     const [location, setLocation] = useState<Location.LocationObject>();
     const [events] = useState(mockEvents);
+    const [carouselFocused, setCarouselFocused] = useState(false);
     const mapRef = useRef<MapView>(null);
     const carouselRef = useRef<ICarouselInstance>(null);
-    const markerRefs = events.map(event => useRef<MapMarker>(null));
+    const markerRefs = events.map(() => useRef<MapMarker>(null));
 
     useEffect(() => {
         (async () => {
-
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 console.error('Permission to access location was denied');
@@ -70,6 +110,7 @@ export const EventMap: React.FC = () => {
                 showsUserLocation={true}
                 minZoomLevel={12}
                 maxZoomLevel={18}
+                onPress={() => setCarouselFocused(false)}
             >
                 {
                     events.map((event, i) => (
@@ -77,10 +118,14 @@ export const EventMap: React.FC = () => {
                             coordinate={event.location}
                             category={event.category}
                             ref={markerRefs[i]}
-                            onPress={() => carouselRef.current?.scrollTo({
-                                index: i,
-                                animated: true,
-                            })}
+                            onPress={() => {
+                                // Known issue: the scroll to index is not working properly
+                                carouselRef.current?.scrollTo({
+                                    index: i,
+                                    animated: true,
+                                });
+                                setCarouselFocused(true);
+                            }}
                             key={i}
                         />
                     ))
@@ -96,7 +141,9 @@ export const EventMap: React.FC = () => {
                         longitudeDelta: 0.01,
                     });
                     markerRefs[i].current?.showCallout();
+                    setCarouselFocused(true);
                 }}
+                carouselFocused={carouselFocused}
             />
         </>
     );

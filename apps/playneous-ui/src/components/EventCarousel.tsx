@@ -1,9 +1,10 @@
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Dimensions, Animated } from "react-native";
 import { responsiveFontSize } from "../utils/responsiveFontSize";
 import { GestureHandlerRootView, TapGestureHandler } from "react-native-gesture-handler";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { EventIcon } from "./EventIcon";
-import { forwardRef } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { Easing, interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
 // placeholder type until prisma schema is ready
 export type TEvent = {
@@ -13,24 +14,75 @@ export type TEvent = {
 
 type TEventCarouselProps = {
     events: TEvent[],
+    carouselFocused: boolean,
     onSnapToItem?: (index: number) => void,
 }
 
-export const EventCarousel = forwardRef<ICarouselInstance, TEventCarouselProps>(({ events, onSnapToItem }, ref) => {
+
+const itemGap = responsiveFontSize(75);
+const centerOffset = responsiveFontSize(10);
+const carouselBottomOffset = responsiveFontSize(5);
+
+export const EventCarousel = forwardRef<ICarouselInstance, TEventCarouselProps>(({ events, carouselFocused, onSnapToItem }, ref) => {
+    // https://github.com/dohooo/react-native-reanimated-carousel/issues/412
+    // Currently, there is a bug in react-native-reanimated-carousel 
+    //  that blocks us from animating the scaling of the focused item, 
+    //  therefore this value is ignored
+    const focusedItemScale = useSharedValue(0.8);
+
+    const animatedCarouselBottomOffset = useRef(new Animated.Value(carouselBottomOffset)).current;
+
+    useEffect(() => {
+        focusedItemScale.value = withTiming(carouselFocused ? 1 : 0.8, { duration: 1000, easing: Easing.linear });
+
+        Animated.timing(animatedCarouselBottomOffset, {
+            toValue: responsiveFontSize(carouselFocused ? 0 : responsiveFontSize(20)),
+            duration: 200,
+            useNativeDriver: true,
+        }).start();
+    }, [carouselFocused, animatedCarouselBottomOffset]);
+
+    const customAnimation = useCallback(
+        (value: number) => {
+            'worklet';
+
+            const zIndex = interpolate(value, [-1, 0, 1], [10, 20, 30]);
+            const translateX = interpolate(
+                value,
+                [-1, 0, 1],
+                [-itemGap, 0, itemGap],
+            ) + centerOffset;
+
+            const scale = interpolate(
+                value,
+                [-1, 0, 1],
+                [0.8, carouselFocused ? 1 : 0.8, 0.8],
+            );
+
+            return {
+                transform: [{ translateX }, { scale }],
+                zIndex,
+            };
+        },
+        [carouselFocused],
+    );
+
 
     return (
-        <View style={styles.carouselContainer}>
+        <Animated.View style={[styles.carouselContainer, { transform: [{ translateY: animatedCarouselBottomOffset }] }]}>
             <GestureHandlerRootView>
                 <Carousel
                     loop
                     ref={ref}
-                    width={responsiveFontSize(100)}
+                    width={responsiveFontSize(80)}
                     height={responsiveFontSize(50)}
+                    style={styles.carousel}
                     data={events}
                     mode="parallax"
                     scrollAnimationDuration={300}
                     snapEnabled={true}
                     onSnapToItem={onSnapToItem}
+                    customAnimation={customAnimation}
                     renderItem={({ item, index }) => (
                         <TapGestureHandler onActivated={() => onSnapToItem?.(index)}>
                             <View style={styles.card}>
@@ -43,9 +95,10 @@ export const EventCarousel = forwardRef<ICarouselInstance, TEventCarouselProps>(
                             </View>
                         </TapGestureHandler>
                     )}
-                />
+                >
+                </Carousel>
             </GestureHandlerRootView>
-        </View>
+        </Animated.View>
     );
 });
 
@@ -53,7 +106,11 @@ const styles = StyleSheet.create({
     carouselContainer: {
         flex: 1,
         position: "absolute",
-        bottom: responsiveFontSize(17),
+        bottom: carouselBottomOffset
+    },
+    carousel: {
+        width: responsiveFontSize(100),
+        height: responsiveFontSize(50),
     },
     card: {
         flex: 1,
